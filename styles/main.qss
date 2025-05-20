@@ -1,0 +1,157 @@
+/* Main Window */
+QMainWindow {
+    background-color: white;
+}
+
+/* Tab Widget */
+QTabWidget::pane {
+    border: none;
+    background-color: white;
+    border-radius: 4px;
+}
+
+/* Command Tab Widget */
+QWidget[objectName^="cmd_tab_widget"] {
+    background-color: #e8e8e8;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+}
+
+QWidget[objectName^="cmd_tab_widget"] QWidget {
+    background-color: #e8e8e8;
+    border: none;
+    border-radius: 4px;
+}
+
+QTabBar::tab {
+    background-color: #f5f5f5;
+    border: 1px solid #dcdcdc;
+    padding: 8px 16px;
+    margin-right: 2px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom: none;
+}
+
+QTabBar::tab:selected {
+    background-color: white;
+    border-bottom: 5px solid #53A6D8;
+    margin-bottom: -1px;  /* 抵消底部边框的宽度，避免出现双边框 */
+}
+
+QTabBar::tab:hover:!selected {
+    background-color: #fafafa;
+}
+
+/* Main Window Buttons */
+QMainWindow QPushButton {
+    background-color: #53A6D8;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+QMainWindow QPushButton:hover {
+    background-color: #6BB5E3;
+}
+
+QMainWindow QPushButton:pressed {
+    background-color: #4A95C7;
+}
+
+QMainWindow QPushButton:disabled {
+    background-color: #d9d9d9;
+}
+
+/* Command Buttons (in command groups) */
+QMainWindow QWidget[objectName^="cmd_tab_widget"] QPushButton {
+    background-color: #53A6D8;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+QMainWindow QWidget[objectName^="cmd_tab_widget"] QPushButton:hover {
+    background-color: #6BB5E3;
+}
+
+QMainWindow QWidget[objectName^="cmd_tab_widget"] QPushButton:pressed {
+    background-color: #4A95C7;
+}
+
+/* Line Edit */
+QLineEdit {
+    padding: 6px;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    background-color: white;
+}
+
+QLineEdit:focus {
+    border-color: #53A6D8;
+}
+
+/* Tree Widget */
+QTreeWidget {
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    background-color: white;
+}
+
+QTreeWidget::item {
+    padding: 4px;
+}
+
+QTreeWidget::item:selected {
+    background-color: #E8F4FC;
+    color: #53A6D8;
+}
+
+/* Text Browser */
+QTextBrowser {
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    background-color: white;
+    padding: 8px;
+}
+
+/* Labels */
+QLabel {
+    color: #262626;
+}
+
+/* Dialog */
+QDialog {
+    background-color: white;
+}
+
+/* Log Window */
+QDialog QTextBrowser {
+    background-color: white;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    padding: 8px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Dialog Buttons */
+QDialog QPushButton {
+    background-color: #53A6D8;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    min-width: 80px;
+}
+
+QDialog QPushButton:hover {
+    background-color: #6BB5E3;
+}
+
+QDialog QPushButton:pressed {
+    background-color: #4A95C7;
+} 

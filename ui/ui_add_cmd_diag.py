@@ -8,16 +8,11 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDialog, QGridLayout, QLabel,
-    QLineEdit, QPushButton, QRadioButton, QSizePolicy,
-    QVBoxLayout, QWidget)
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize)
+from PySide6.QtWidgets import (QGridLayout, QLabel,
+                               QLineEdit, QPushButton, QRadioButton, QSizePolicy,
+                               QVBoxLayout)
+
 
 class Ui_AddCommandDialog(object):
     def setupUi(self, AddCommandDialog):
@@ -108,32 +103,35 @@ class Ui_AddCommandDialog(object):
 
         self.gridLayout.addWidget(self.label_2, 2, 1, 1, 1)
 
-
         self.verticalLayout.addLayout(self.gridLayout)
-
 
         self.retranslateUi(AddCommandDialog)
 
         QMetaObject.connectSlotsByName(AddCommandDialog)
+
     # setupUi
 
     def retranslateUi(self, AddCommandDialog):
-        AddCommandDialog.setWindowTitle(QCoreApplication.translate("AddCommandDialog", u"\u6dfb\u52a0\u547d\u4ee4", None))
+        AddCommandDialog.setWindowTitle(
+            QCoreApplication.translate("AddCommandDialog", u"\u6dfb\u52a0\u547d\u4ee4", None))
         self.radio_block_no.setText(QCoreApplication.translate("AddCommandDialog", u"\u5426", None))
-        self.color_label.setText(QCoreApplication.translate("AddCommandDialog", u"\u6309\u94ae\u989c\u8272\uff1a", None))
+        self.color_label.setText(
+            QCoreApplication.translate("AddCommandDialog", u"\u6309\u94ae\u989c\u8272\uff1a", None))
         self.btn_save_cmd.setText(QCoreApplication.translate("AddCommandDialog", u"\u6dfb\u52a0", None))
         self.radio_block_yes.setText(QCoreApplication.translate("AddCommandDialog", u"\u662f", None))
         self.btn_cancel_cmd.setText(QCoreApplication.translate("AddCommandDialog", u"\u53d6\u6d88", None))
         self.cmd_label.setText(QCoreApplication.translate("AddCommandDialog", u"ADB\u547d\u4ee4\uff1a", None))
         self.name_label.setText(QCoreApplication.translate("AddCommandDialog", u"\u6309\u94ae\u540d\u79f0\uff1a", None))
-#if QT_CONFIG(tooltip)
-        self.label.setToolTip(QCoreApplication.translate("AddCommandDialog", u"\u5982adb logcat\u8fd9\u7c7b\u6301\u7eed\u8f93\u51fa\u7684\u547d\u4ee4", None))
-#endif // QT_CONFIG(tooltip)
-#if QT_CONFIG(whatsthis)
+        # if QT_CONFIG(tooltip)
+        self.label.setToolTip(QCoreApplication.translate("AddCommandDialog",
+                                                         u"\u5982adb logcat\u8fd9\u7c7b\u6301\u7eed\u8f93\u51fa\u7684\u547d\u4ee4",
+                                                         None))
+        # endif // QT_CONFIG(tooltip)
+        # if QT_CONFIG(whatsthis)
         self.label.setWhatsThis("")
-#endif // QT_CONFIG(whatsthis)
-        self.label.setText(QCoreApplication.translate("AddCommandDialog", u"\u963b\u585e\u5f0f\u547d\u4ee4\uff1a", None))
+        # endif // QT_CONFIG(whatsthis)
+        self.label.setText(
+            QCoreApplication.translate("AddCommandDialog", u"\u963b\u585e\u5f0f\u547d\u4ee4\uff1a", None))
         self.btn_choose_color.setText(QCoreApplication.translate("AddCommandDialog", u"\u9009\u62e9\u989c\u8272", None))
         self.label_2.setText("")
     # retranslateUi
-

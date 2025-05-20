@@ -1,18 +1,77 @@
-import sys
-import os
-import csv
-import subprocess
-import threading
 import asyncio
+import csv
+import os
+import subprocess
+import sys
+import tempfile
+import threading
 from datetime import datetime
 from typing import override
 
+from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtGui import QIcon, QColor
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QInputDialog, QTreeWidgetItem, QMenu, QWidget,
                                QVBoxLayout, QPushButton, QDialog, QColorDialog, QGridLayout, QTextBrowser, QHBoxLayout)
-from PySide6.QtCore import Qt, QThread, Signal, QSize
-from ui_main_window import Ui_MainWindow
-from ui_register_device_diag import Ui_diag_register_device
-from ui_add_cmd_diag import Ui_AddCommandDialog
+
+from ui.ui_add_cmd_diag import Ui_AddCommandDialog
+from ui.ui_main_window import Ui_MainWindow
+from ui.ui_register_device_diag import Ui_diag_register_device
+
+
+def get_resource_path(relative_path):
+    """获取资源文件的路径"""
+    try:
+        # 如果是打包后的exe
+        base_path = sys._MEIPASS
+    except Exception:
+        # 如果是开发环境
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, relative_path)
+
+
+def get_app_path():
+    """获取应用程序所在目录"""
+    if getattr(sys, 'frozen', False):
+        # 如果是打包后的exe
+        return os.path.dirname(sys.executable)
+    else:
+        # 如果是开发环境
+        return os.path.dirname(os.path.abspath(__file__))
+
+
+def get_config_path():
+    """获取配置文件目录"""
+    config_dir = os.path.join(get_app_path(), "config")
+    if not os.path.exists(config_dir):
+        os.makedirs(config_dir)
+    return config_dir
+
+
+def get_temp_file_path(filename):
+    """获取临时文件路径"""
+    return os.path.join(tempfile.gettempdir(), filename)
+
+
+def load_stylesheet():
+    """加载所有样式表"""
+    styles = []
+    style_files = [
+        'styles/main.qss',
+        'styles/dialog.qss',
+        'styles/command_button.qss',
+        'styles/dynamic_buttons.qss'
+    ]
+    
+    for style_file in style_files:
+        try:
+            style_path = get_resource_path(style_file)
+            if os.path.exists(style_path):
+                with open(style_path, 'r', encoding='utf-8') as f:
+                    styles.append(f.read())
+        except Exception as e:
+            print(f"加载样式表 {style_file} 失败: {e}")
+    
+    return '\n'.join(styles)
 
 
 class RegisterDeviceDialog(QDialog):
@@ -64,14 +123,23 @@ class AddCmdDialog(QDialog):
         self.ui.btn_save_cmd.clicked.connect(self.accept)
         self.ui.btn_cancel_cmd.clicked.connect(self.reject)
         self.ui.btn_choose_color.clicked.connect(self.choose_color)
-        self.color = "#FFFFFF"  # 默认白色
-        self.ui.btn_choose_color.setStyleSheet(f"background-color: {self.color}")
+        self.color = "#E0E0E0"  # 默认浅灰色
+        self.ui.btn_choose_color.setObjectName("btn_choose_color")
+        self.update_color_button()
+        
+        # 设置按钮名称输入框获得焦点
+        self.ui.diag_input_btn_name.setFocus()
+        # 选中输入框中的文本（如果有的话）
+        self.ui.diag_input_btn_name.selectAll()
 
     def choose_color(self):
         color = QColorDialog.getColor()
         if color.isValid():
             self.color = color.name()
-            self.ui.btn_choose_color.setStyleSheet(f"background-color: {self.color}")
+            self.update_color_button()
+
+    def update_color_button(self):
+        self.ui.btn_choose_color.setStyleSheet(f"background-color: {self.color};")
 
     @override
     def accept(self):
@@ -105,7 +173,7 @@ class CommandThread(QThread):
             cmd = self.cmd.strip()
             if cmd.lower().startswith('adb '):
                 cmd = cmd[4:].strip()
-            
+
             self.process = subprocess.Popen(
                 f"adb -s {self.serial} {cmd}",
                 stdout=subprocess.PIPE,
@@ -210,31 +278,39 @@ class LogWindow(QDialog):
         super().__init__(parent)
         self.setWindowTitle("日志窗口")
         self.resize(800, 600)  # 设置更大的窗口尺寸
-        
+
+        # 加载样式表
+        self.setStyleSheet(load_stylesheet())
+
         # 创建布局
         layout = QVBoxLayout(self)
-        
+        layout.setSpacing(10)
+        layout.setContentsMargins(16, 16, 16, 16)
+
         # 创建文本浏览器
         self.text_browser = QTextBrowser()
         self.text_browser.setLineWrapMode(QTextBrowser.LineWrapMode.NoWrap)
         self.text_browser.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         layout.addWidget(self.text_browser)
-        
+
         # 创建按钮布局
         button_layout = QHBoxLayout()
-        
+        button_layout.setSpacing(10)
+
         # 创建清除按钮
         self.clear_button = QPushButton("清除日志")
+        self.clear_button.setIcon(QIcon(get_resource_path('resources/clear.png')))
         self.clear_button.clicked.connect(self.clear_log)
         button_layout.addWidget(self.clear_button)
-        
+
         # 创建关闭按钮
         self.close_button = QPushButton("关闭")
+        self.close_button.setIcon(QIcon(get_resource_path('resources/close.png')))
         self.close_button.clicked.connect(self.close)
         button_layout.addWidget(self.close_button)
-        
+
         layout.addLayout(button_layout)
-        
+
         # 设置窗口属性
         self.setWindowFlags(Qt.WindowType.Window | Qt.WindowType.WindowStaysOnTopHint)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
@@ -262,15 +338,33 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        # 设置应用图标
+        icon_path = get_resource_path('resources/app_icon.ico')
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
+            self.setWindowTitle("多设备管理工具")
+
+        # 加载样式表
+        self.setStyleSheet(load_stylesheet())
+
         # 初始化变量
-        self.devices_file = "devices.csv"
-        self.commands_file = "commands.csv"
-        self.groups_file = "groups.csv"  # 新增分组信息文件
-        self.log_file = f"log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        self.devices_file = os.path.join(get_config_path(), "devices.csv")
+        self.commands_file = os.path.join(get_config_path(), "commands.csv")
+        self.groups_file = os.path.join(get_config_path(), "groups.csv")
+
+        # 创建日志目录
+        log_dir = os.path.join(get_app_path(), "logs")
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        self.log_file = os.path.join(log_dir, f"log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+
+        # 初始化配置文件
+        self.init_config_files()
+
         self.registered_devices = {}  # serial -> note
         self.command_threads = []
         self.log_writer = LogWriter(self.log_file)
-        
+
         # 添加按钮状态标志
         self.is_refreshing = False
         self.is_running_command = False
@@ -304,9 +398,40 @@ class MainWindow(QMainWindow):
 
         # 初始刷新设备列表
         self.refresh_devices()
-        
+
         # 初始化停止按钮状态
         self.ui.btn_stop_cmd.setEnabled(False)
+
+    def init_config_files(self):
+        """初始化配置文件，如果配置目录中不存在，则从资源中复制"""
+        # 确保样式表目录存在
+        styles_dir = os.path.join(get_app_path(), "styles")
+        if not os.path.exists(styles_dir):
+            os.makedirs(styles_dir)
+
+        config_files = {
+            "config/devices.csv": self.devices_file,
+            "config/commands.csv": self.commands_file,
+            "config/groups.csv": self.groups_file,
+            "styles/main.qss": os.path.join(styles_dir, "main.qss"),
+            "styles/dialog.qss": os.path.join(styles_dir, "dialog.qss"),
+            "styles/command_button.qss": os.path.join(styles_dir, "command_button.qss")
+        }
+
+        for resource_name, config_path in config_files.items():
+            if not os.path.exists(config_path):
+                try:
+                    # 尝试从资源中读取
+                    resource_path = get_resource_path(resource_name)
+                    if os.path.exists(resource_path):
+                        # 如果资源文件存在，复制到配置目录
+                        with open(resource_path, 'r', encoding='utf-8') as src:
+                            with open(config_path, 'w', encoding='utf-8') as dst:
+                                dst.write(src.read())
+                except:
+                    # 如果资源文件不存在，创建空文件
+                    with open(config_path, 'w', encoding='utf-8') as f:
+                        f.write('')
 
     def bind(self):
         self.ui.btn_refresh_online_device.clicked.connect(self.refresh_devices)
@@ -335,7 +460,7 @@ class MainWindow(QMainWindow):
                     content = f.read().strip()
                     if not content:  # 如果文件为空
                         return
-                    
+
                     # 重新打开文件读取分组
                     f.seek(0)
                     reader = csv.reader(f)
@@ -350,7 +475,7 @@ class MainWindow(QMainWindow):
                             layout.setContentsMargins(10, 10, 10, 10)
                             layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
                             self.ui.cmd_tab_widget.addTab(new_group, group_name)
-                    
+
                     # 只有在文件存在但没有任何有效分组时才创建默认分组
                     if not has_groups:
                         new_group = QWidget()
@@ -434,9 +559,23 @@ class MainWindow(QMainWindow):
             self.load_devices()
 
             # 获取在线设备
-            result = subprocess.run(['adb', 'devices'], capture_output=True, text=True)
+            startupinfo = None
+            if os.name == 'nt':  # Windows系统
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                startupinfo.wShowWindow = subprocess.SW_HIDE
+
+            process = subprocess.Popen(
+                ['adb', 'devices'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                startupinfo=startupinfo
+            )
+            stdout, stderr = process.communicate()
+
             devices = []
-            for line in result.stdout.split('\n')[1:]:
+            for line in stdout.split('\n')[1:]:
                 if '\tdevice' in line:
                     serial = line.split('\t')[0]
                     devices.append(serial)
@@ -449,8 +588,12 @@ class MainWindow(QMainWindow):
             self.ui.device_tree_widget.clear()
 
             # 创建已登记和未登记分组
-            registered_item = QTreeWidgetItem(self.ui.device_tree_widget, ['已登记设备'])
-            unregistered_item = QTreeWidgetItem(self.ui.device_tree_widget, ['未登记设备'])
+            registered_item = QTreeWidgetItem(self.ui.device_tree_widget, ['📱 已登记设备'])
+            unregistered_item = QTreeWidgetItem(self.ui.device_tree_widget, ['📱 未登记设备'])
+
+            # 设置分组样式
+            registered_item.setBackground(0, QColor("#f6ffed"))
+            unregistered_item.setBackground(0, QColor("#fff7e6"))
 
             # 添加设备到对应分组
             registered_count = 0
@@ -462,11 +605,13 @@ class MainWindow(QMainWindow):
                     item.setText(1, serial)
                     item.setText(2, self.registered_devices[serial])
                     item.setCheckState(0, Qt.CheckState.Unchecked)
+                    item.setIcon(1, QIcon(get_resource_path('resources/device.png')))
                     registered_count += 1
                 else:
                     item = QTreeWidgetItem(unregistered_item)
                     item.setText(1, serial)
                     item.setCheckState(0, Qt.CheckState.Unchecked)
+                    item.setIcon(1, QIcon(get_resource_path('resources/device.png')))
                     unregistered_count += 1
 
             # 如果分组下没有设备，则移除该分组
@@ -598,7 +743,7 @@ class MainWindow(QMainWindow):
             layout.setSpacing(10)
             layout.setContentsMargins(10, 10, 10, 10)
             layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
-            
+
             new_index = self.ui.cmd_tab_widget.addTab(new_group, name)
             # 切换到新创建的分组
             self.ui.cmd_tab_widget.setCurrentIndex(new_index)
@@ -614,27 +759,27 @@ class MainWindow(QMainWindow):
         # 获取当前分组的widget和布局
         group_widget = self.ui.cmd_tab_widget.widget(current_index)
         layout = group_widget.layout()
-        
+
         # 计算当前按钮数量
         current_buttons = len(group_widget.findChildren(QPushButton))
-        
+
         # 计算每行可以放置的按钮数量（考虑按钮宽度和间距）
-        button_width = 80  # 按钮宽度
-        button_height = 30  # 按钮高度
-        spacing = 10  # 按钮间距
-        margins = 10  # 布局边距
-        
+        button_width = 90  # 按钮宽度
+        button_height = 28  # 按钮高度
+        spacing = 8  # 按钮间距
+        margins = 8  # 布局边距
+
         # 获取当前分组的可用宽度
         available_width = group_widget.width() - 2 * margins
         buttons_per_row = (available_width + spacing) // (button_width + spacing)
-        
+
         # 计算每列可以放置的按钮数量（考虑按钮高度和间距）
         available_height = group_widget.height() - 2 * margins
         buttons_per_column = (available_height + spacing) // (button_height + spacing)
-        
+
         # 计算最大按钮数量
         max_buttons = buttons_per_row * buttons_per_column
-        
+
         # 如果当前按钮数量达到最大值，显示提示对话框
         if current_buttons >= max_buttons:
             reply = QMessageBox.question(
@@ -667,9 +812,9 @@ class MainWindow(QMainWindow):
                 layout = group_widget.layout()
                 if not layout:
                     layout = QGridLayout(group_widget)
-                    layout.setSpacing(10)  # 设置按钮之间的间距
-                    layout.setContentsMargins(10, 10, 10, 10)  # 设置布局边距
-                    layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)  # 设置对齐方式为左上
+                    layout.setSpacing(8)  # 按钮之间的间距
+                    layout.setContentsMargins(8, 8, 8, 8)  # 布局边距
+                    layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
                 # 获取当前按钮数量，用于计算位置
                 button_count = len(group_widget.findChildren(QPushButton))
@@ -678,21 +823,25 @@ class MainWindow(QMainWindow):
 
                 # 创建命令按钮
                 button = QPushButton(name)
+                button.setObjectName(f"cmd_button_{button_count}")
                 button.setProperty('cmd', cmd)
                 button.setProperty('is_blocking', is_blocking)
                 button.setProperty('color', color)
-                button.setStyleSheet(f"background-color: {color}")
+                
+                # 设置按钮固定大小
+                button.setFixedSize(90, 28)
+                
+                # 设置按钮背景色
+                button.setStyleSheet(f"background-color: {color};")
+                
                 button.clicked.connect(lambda checked, b=button: self.run_command(b))
-                
-                # 设置按钮的固定大小
-                button.setFixedSize(80, 30)  # 调整按钮的固定宽度和高度
-                
+
                 # 设置右键菜单
                 button.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
                 button.customContextMenuRequested.connect(
                     lambda pos, b=button, g=group_name: self.show_cmd_button_context_menu(pos, b, g)
                 )
-                
+
                 # 将按钮添加到网格布局中
                 layout.addWidget(button, row, col)
                 break
@@ -714,7 +863,7 @@ class MainWindow(QMainWindow):
         dialog.ui.diag_input_adb.setText(button.property('cmd'))
         dialog.ui.radio_block_yes.setChecked(button.property('is_blocking'))
         dialog.color = button.property('color')
-        dialog.ui.btn_choose_color.setStyleSheet(f"background-color: {dialog.color}")
+        dialog.update_color_button()
 
         if dialog.exec():
             # 更新按钮属性
@@ -722,8 +871,8 @@ class MainWindow(QMainWindow):
             button.setProperty('cmd', dialog.cmd)
             button.setProperty('is_blocking', dialog.is_blocking)
             button.setProperty('color', dialog.color)
-            button.setStyleSheet(f"background-color: {dialog.color}")
-            
+            button.setStyleSheet(f"background-color: {dialog.color};")
+
             # 保存更改
             self.save_commands()
 
@@ -737,10 +886,10 @@ class MainWindow(QMainWindow):
             # 从布局中移除按钮
             button.setParent(None)
             button.deleteLater()
-            
+
             # 重新排列剩余按钮
             self.rearrange_buttons(group_name)
-            
+
             # 保存更改
             self.save_commands()
 
@@ -752,21 +901,22 @@ class MainWindow(QMainWindow):
                 layout = group_widget.layout()
                 if not layout:
                     layout = QGridLayout(group_widget)
-                    layout.setSpacing(10)  # 设置按钮之间的间距
-                    layout.setContentsMargins(10, 10, 10, 10)  # 设置布局边距
-                    layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)  # 设置对齐方式为左上
+                    layout.setSpacing(8)  # 按钮之间的间距
+                    layout.setContentsMargins(8, 8, 8, 8)  # 布局边距
+                    layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
 
                 # 获取所有按钮
                 buttons = group_widget.findChildren(QPushButton)
-                
+
                 # 从布局中移除所有按钮
                 for button in buttons:
                     layout.removeWidget(button)
-                
+
                 # 重新添加按钮到布局
                 for idx, button in enumerate(buttons):
                     row = idx // 3
                     col = idx % 3
+                    button.setFixedSize(80, 28)  # 确保所有按钮大小一致
                     layout.addWidget(button, row, col)
                 break
 
@@ -830,12 +980,12 @@ class MainWindow(QMainWindow):
             # 先尝试停止所有线程
             for thread in self.command_threads:
                 thread.stop()
-            
+
             # 等待所有线程停止
             for thread in self.command_threads:
                 if thread.isRunning():
                     thread.wait(1000)  # 等待最多1秒
-            
+
             # 清理线程列表和重置按钮状态
             self.command_threads.clear()
             self.ui.btn_stop_cmd.setEnabled(False)
@@ -845,15 +995,26 @@ class MainWindow(QMainWindow):
     def handle_command_output(self, time_str, serial, note, text, is_error):
         # 格式化输出
         if is_error:
-            color = "red"
+            color = "#ff4d4f"  # 错误信息使用红色
+            icon = "❌"
         else:
-            color = "black"
+            color = "#52c41a"  # 成功信息使用绿色
+            icon = "✅"
 
-        output = f'<span style="color: {color}">[{time_str}][{serial}][{note}]{text}</span>'
+        # 使用更现代的样式
+        output = f'''
+            <div style="margin: 4px 0; padding: 8px; background-color: #fafafa; border-radius: 4px;">
+                <span style="color: #8c8c8c;">{time_str}</span>
+                <span style="color: #1890ff; font-weight: bold; margin: 0 8px;">{serial}</span>
+                <span style="color: #595959; margin-right: 8px;">{note}</span>
+                <span style="color: {color}; margin-right: 4px;">{icon}</span>
+                <span style="color: {color};">{text}</span>
+            </div>
+        '''
 
         # 更新UI
         self.ui.output_text_browser.append(output)
-        
+
         # 如果日志窗口存在，也更新日志窗口
         if self.log_window and self.log_window.isVisible():
             self.log_window.append_log(output)
@@ -881,7 +1042,7 @@ class MainWindow(QMainWindow):
             if thread.isRunning():
                 all_finished = False
                 break
-        
+
         # 如果所有线程都已完成，禁用停止按钮
         if all_finished:
             self.ui.btn_stop_cmd.setEnabled(False)
@@ -897,8 +1058,12 @@ class MainWindow(QMainWindow):
         super().closeEvent(event)
 
 
-if __name__ == '__main__':
+def main():
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

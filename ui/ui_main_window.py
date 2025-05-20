@@ -8,18 +8,12 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
-    QCursor, QFont, QFontDatabase, QGradient,
-    QIcon, QImage, QKeySequence, QLinearGradient,
-    QPainter, QPalette, QPixmap, QRadialGradient,
-    QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QHeaderView,
-    QLabel, QLineEdit, QMainWindow, QPushButton,
-    QSizePolicy, QTabWidget, QTextBrowser, QTreeWidget,
-    QTreeWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize, Qt)
+from PySide6.QtGui import (QAction)
+from PySide6.QtWidgets import (QFrame, QHBoxLayout, QLabel, QLineEdit, QPushButton,
+                               QSizePolicy, QTabWidget, QTextBrowser, QTreeWidget,
+                               QVBoxLayout, QWidget)
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -85,7 +79,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.btn_register_device)
 
-
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
         self.device_tree_widget = QTreeWidget(self.tab_device)
@@ -99,7 +92,6 @@ class Ui_MainWindow(object):
         self.device_tree_widget.header().setHighlightSections(False)
 
         self.verticalLayout_2.addWidget(self.device_tree_widget)
-
 
         self.verticalLayout_3.addLayout(self.verticalLayout_2)
 
@@ -120,7 +112,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_2.addWidget(self.btn_direct_run)
 
-
         self.verticalLayout_5.addLayout(self.horizontalLayout_2)
 
         self.horizontalLayout_3 = QHBoxLayout()
@@ -139,7 +130,6 @@ class Ui_MainWindow(object):
         self.btn_stop_cmd.setObjectName(u"btn_stop_cmd")
 
         self.horizontalLayout_3.addWidget(self.btn_stop_cmd)
-
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_3)
 
@@ -160,7 +150,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_4.addWidget(self.cmd_tab_widget)
 
-
         self.verticalLayout_5.addLayout(self.verticalLayout_4)
 
         self.tab_widget.addTab(self.tab_cmd, "")
@@ -180,7 +169,6 @@ class Ui_MainWindow(object):
         self.btn_pop_log.setMaximumSize(QSize(100, 60))
 
         self.horizontalLayout_4.addWidget(self.btn_pop_log)
-
 
         self.verticalLayout.addLayout(self.horizontalLayout_4)
 
@@ -203,36 +191,49 @@ class Ui_MainWindow(object):
         self.tab_widget.setCurrentIndex(0)
         self.cmd_tab_widget.setCurrentIndex(0)
 
-
         QMetaObject.connectSlotsByName(MainWindow)
+
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Android\u8bbe\u5907\u6279\u91cf\u64cd\u4f5c\u5de5\u5177", None))
+        MainWindow.setWindowTitle(
+            QCoreApplication.translate("MainWindow", u"Android\u8bbe\u5907\u6279\u91cf\u64cd\u4f5c\u5de5\u5177", None))
         self.actionAddDevice.setText(QCoreApplication.translate("MainWindow", u"\u767b\u8bb0\u8bbe\u5907", None))
         self.action.setText(QCoreApplication.translate("MainWindow", u"\u5bfc\u51fa\u8bbe\u5907\u5217\u8868", None))
-        self.action_import_devices.setText(QCoreApplication.translate("MainWindow", u"\u5bfc\u5165\u8bbe\u5907\u5217\u8868", None))
+        self.action_import_devices.setText(
+            QCoreApplication.translate("MainWindow", u"\u5bfc\u5165\u8bbe\u5907\u5217\u8868", None))
         self.actionAddCommand.setText(QCoreApplication.translate("MainWindow", u"\u6dfb\u52a0\u65b0\u547d\u4ee4", None))
-        self.action_export_commands.setText(QCoreApplication.translate("MainWindow", u"\u5bfc\u51fa\u547d\u4ee4\u5217\u8868", None))
-        self.action_import_commands.setText(QCoreApplication.translate("MainWindow", u"\u5bfc\u5165\u547d\u4ee4\u5217\u8868", None))
-        self.actionOpenLocalCfg.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5f00\u914d\u7f6e\u6587\u4ef6\u8def\u5f84", None))
-        self.actionExportCfgToLocal.setText(QCoreApplication.translate("MainWindow", u"\u5bfc\u51fa\u914d\u7f6e\u5230\u672c\u5730", None))
-        self.label.setText(QCoreApplication.translate("MainWindow", u"\u5f53\u524d\u5728\u7ebf\u8bbe\u5907\uff1a", None))
+        self.action_export_commands.setText(
+            QCoreApplication.translate("MainWindow", u"\u5bfc\u51fa\u547d\u4ee4\u5217\u8868", None))
+        self.action_import_commands.setText(
+            QCoreApplication.translate("MainWindow", u"\u5bfc\u5165\u547d\u4ee4\u5217\u8868", None))
+        self.actionOpenLocalCfg.setText(
+            QCoreApplication.translate("MainWindow", u"\u6253\u5f00\u914d\u7f6e\u6587\u4ef6\u8def\u5f84", None))
+        self.actionExportCfgToLocal.setText(
+            QCoreApplication.translate("MainWindow", u"\u5bfc\u51fa\u914d\u7f6e\u5230\u672c\u5730", None))
+        self.label.setText(
+            QCoreApplication.translate("MainWindow", u"\u5f53\u524d\u5728\u7ebf\u8bbe\u5907\uff1a", None))
         self.label_device_count.setText("")
-        self.btn_refresh_online_device.setText(QCoreApplication.translate("MainWindow", u"\u5237\u65b0\u5728\u7ebf\u8bbe\u5907", None))
-        self.btn_register_device.setText(QCoreApplication.translate("MainWindow", u"\u767b\u8bb0\u65b0\u8bbe\u5907", None))
+        self.btn_refresh_online_device.setText(
+            QCoreApplication.translate("MainWindow", u"\u5237\u65b0\u5728\u7ebf\u8bbe\u5907", None))
+        self.btn_register_device.setText(
+            QCoreApplication.translate("MainWindow", u"\u767b\u8bb0\u65b0\u8bbe\u5907", None))
         ___qtreewidgetitem = self.device_tree_widget.headerItem()
         ___qtreewidgetitem.setText(2, QCoreApplication.translate("MainWindow", u"\u5907\u6ce8", None));
         ___qtreewidgetitem.setText(1, QCoreApplication.translate("MainWindow", u"\u5e8f\u5217\u53f7", None));
         ___qtreewidgetitem.setText(0, QCoreApplication.translate("MainWindow", u"\u5206\u7c7b", None));
-        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_device), QCoreApplication.translate("MainWindow", u"\u8bbe\u5907\u7ba1\u7406", None))
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_device),
+                                   QCoreApplication.translate("MainWindow", u"\u8bbe\u5907\u7ba1\u7406", None))
         self.btn_direct_run.setText(QCoreApplication.translate("MainWindow", u"\u76f4\u63a5\u4e0b\u53d1", None))
-        self.btn_add_new_group.setText(QCoreApplication.translate("MainWindow", u"\u6dfb\u52a0\u65b0\u5206\u7ec4", None))
+        self.btn_add_new_group.setText(
+            QCoreApplication.translate("MainWindow", u"\u6dfb\u52a0\u65b0\u5206\u7ec4", None))
         self.btn_add_cmd.setText(QCoreApplication.translate("MainWindow", u"\u6dfb\u52a0\u65b0\u6309\u94ae", None))
-        self.btn_stop_cmd.setText(QCoreApplication.translate("MainWindow", u"\u505c\u6b62\u963b\u585e\u5f0f\u547d\u4ee4", None))
-        self.cmd_tab_widget.setTabText(self.cmd_tab_widget.indexOf(self.cmd_table_default), QCoreApplication.translate("MainWindow", u"\u9ed8\u8ba4\u5206\u7ec4", None))
-        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_cmd), QCoreApplication.translate("MainWindow", u"\u547d\u4ee4\u7ba1\u7406", None))
+        self.btn_stop_cmd.setText(
+            QCoreApplication.translate("MainWindow", u"\u505c\u6b62\u963b\u585e\u5f0f\u547d\u4ee4", None))
+        self.cmd_tab_widget.setTabText(self.cmd_tab_widget.indexOf(self.cmd_table_default),
+                                       QCoreApplication.translate("MainWindow", u"\u9ed8\u8ba4\u5206\u7ec4", None))
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.tab_cmd),
+                                   QCoreApplication.translate("MainWindow", u"\u547d\u4ee4\u7ba1\u7406", None))
         self.btn_clear_log.setText(QCoreApplication.translate("MainWindow", u"\u6e05\u9664\u65e5\u5fd7", None))
         self.btn_pop_log.setText(QCoreApplication.translate("MainWindow", u"\u5f39\u51fa\u65e5\u5fd7\u6846", None))
     # retranslateUi
-

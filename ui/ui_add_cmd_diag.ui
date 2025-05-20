@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>AddCommandDialog</class>
+    <widget class="QDialog" name="AddCommandDialog">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>400</width>
+                <height>300</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>添加命令</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+                <layout class="QFormLayout" name="formLayout">
+                    <item row="0" column="0">
+                        <widget class="QLabel" name="label">
+                            <property name="text">
+                                <string>按钮名称：</string>
+                            </property>
+                        </widget>
+                    </item>
+                    <item row="0" column="1">
+                        <widget class="QLineEdit" name="diag_input_btn_name"/>
+                    </item>
+                    <item row="1" column="0">
+                        <widget class="QLabel" name="label_2">
+                            <property name="text">
+                                <string>命令：</string>
+                            </property>
+                        </widget>
+                    </item>
+                    <item row="1" column="1">
+                        <widget class="QLineEdit" name="diag_input_adb"/>
+                    </item>
+                    <item row="2" column="0">
+                        <widget class="QLabel" name="label_3">
+                            <property name="text">
+                                <string>是否阻塞：</string>
+                            </property>
+                        </widget>
+                    </item>
+                    <item row="2" column="1">
+                        <layout class="QHBoxLayout" name="horizontalLayout">
+                            <item>
+                                <widget class="QRadioButton" name="radio_block_yes">
+                                    <property name="text">
+                                        <string>是</string>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>true</bool>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QRadioButton" name="radio_block_no">
+                                    <property name="text">
+                                        <string>否</string>
+                                    </property>
+                                </widget>
+                            </item>
+                        </layout>
+                    </item>
+                    <item row="3" column="0">
+                        <widget class="QLabel" name="label_4">
+                            <property name="text">
+                                <string>按钮颜色：</string>
+                            </property>
+                        </widget>
+                    </item>
+                    <item row="3" column="1">
+                        <widget class="QPushButton" name="btn_choose_color">
+                            <property name="text">
+                                <string>选择颜色</string>
+                            </property>
+                        </widget>
+                    </item>
+                </layout>
+            </item>
+            <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                    <item>
+                        <widget class="QPushButton" name="btn_save_cmd">
+                            <property name="text">
+                                <string>保存</string>
+                            </property>
+                        </widget>
+                    </item>
+                    <item>
+                        <widget class="QPushButton" name="btn_cancel_cmd">
+                            <property name="text">
+                                <string>取消</string>
+                            </property>
+                        </widget>
+                    </item>
+                </layout>
+            </item>
+        </layout>
+    </widget>
+    <resources/>
+    <connections/>
+</ui> 

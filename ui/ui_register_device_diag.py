@@ -8,16 +8,10 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QVBoxLayout,
-    QWidget)
+from PySide6.QtCore import (QCoreApplication, QMetaObject, QSize)
+from PySide6.QtWidgets import (QHBoxLayout, QLabel,
+                               QLineEdit, QPushButton, QSizePolicy, QVBoxLayout)
+
 
 class Ui_diag_register_device(object):
     def setupUi(self, diag_register_device):
@@ -48,7 +42,6 @@ class Ui_diag_register_device(object):
 
         self.verticalLayout_2.addWidget(self.cmd_label)
 
-
         self.horizontalLayout.addLayout(self.verticalLayout_2)
 
         self.verticalLayout = QVBoxLayout()
@@ -67,9 +60,7 @@ class Ui_diag_register_device(object):
 
         self.verticalLayout.addWidget(self.diag_input_note)
 
-
         self.horizontalLayout.addLayout(self.verticalLayout)
-
 
         self.verticalLayout_3.addLayout(self.horizontalLayout)
 
@@ -90,22 +81,26 @@ class Ui_diag_register_device(object):
 
         self.horizontalLayout_2.addWidget(self.btn_register_device)
 
-
         self.verticalLayout_3.addLayout(self.horizontalLayout_2)
-
 
         self.retranslateUi(diag_register_device)
 
         QMetaObject.connectSlotsByName(diag_register_device)
+
     # setupUi
 
     def retranslateUi(self, diag_register_device):
-        diag_register_device.setWindowTitle(QCoreApplication.translate("diag_register_device", u"\u6ce8\u518c\u8bbe\u5907", None))
+        diag_register_device.setWindowTitle(
+            QCoreApplication.translate("diag_register_device", u"\u767b\u8bb0\u65b0\u8bbe\u5907", None))
         self.name_label.setText(QCoreApplication.translate("diag_register_device", u"\u5e8f\u5217\u53f7\uff1a", None))
-        self.cmd_label.setText(QCoreApplication.translate("diag_register_device", u"\u5907\u6ce8\u4fe1\u606f\uff1a", None))
-        self.diag_input_serial.setPlaceholderText(QCoreApplication.translate("diag_register_device", u"\u901a\u8fc7adb devices\u67e5\u8be2\u7684\u5e8f\u5217\u53f7", None))
-        self.diag_input_note.setPlaceholderText(QCoreApplication.translate("diag_register_device", u"\u8f93\u5165\u8bbe\u5907\u578b\u53f7\uff0c\u81ea\u5b9a\u4e49\u7f16\u53f7\u7b49", None))
+        self.cmd_label.setText(
+            QCoreApplication.translate("diag_register_device", u"\u5907\u6ce8\u4fe1\u606f\uff1a", None))
+        self.diag_input_serial.setPlaceholderText(QCoreApplication.translate("diag_register_device",
+                                                                             u"\u901a\u8fc7adb devices\u67e5\u8be2\u7684\u5e8f\u5217\u53f7",
+                                                                             None))
+        self.diag_input_note.setPlaceholderText(QCoreApplication.translate("diag_register_device",
+                                                                           u"\u8f93\u5165\u8bbe\u5907\u578b\u53f7\uff0c\u81ea\u5b9a\u4e49\u7f16\u53f7\u7b49",
+                                                                           None))
         self.btn_cancel_device.setText(QCoreApplication.translate("diag_register_device", u"\u53d6\u6d88", None))
         self.btn_register_device.setText(QCoreApplication.translate("diag_register_device", u"\u6ce8\u518c", None))
     # retranslateUi
-
