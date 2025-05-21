@@ -1,3 +1,7 @@
+"""样式定义文件"""
+
+# 主窗口样式
+MAIN_STYLE = """
 /* Main Window */
 QMainWindow {
     background-color: white;
@@ -64,23 +68,6 @@ QMainWindow QPushButton:disabled {
     background-color: #d9d9d9;
 }
 
-/* Command Buttons (in command groups) */
-QMainWindow QWidget[objectName^="cmd_tab_widget"] QPushButton {
-    background-color: #53A6D8;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-}
-
-QMainWindow QWidget[objectName^="cmd_tab_widget"] QPushButton:hover {
-    background-color: #6BB5E3;
-}
-
-QMainWindow QWidget[objectName^="cmd_tab_widget"] QPushButton:pressed {
-    background-color: #4A95C7;
-}
-
 /* Line Edit */
 QLineEdit {
     padding: 6px;
@@ -121,7 +108,10 @@ QTextBrowser {
 QLabel {
     color: #262626;
 }
+"""
 
+# 对话框样式
+DIALOG_STYLE = """
 /* Dialog */
 QDialog {
     background-color: white;
@@ -154,4 +144,65 @@ QDialog QPushButton:hover {
 
 QDialog QPushButton:pressed {
     background-color: #4A95C7;
-} 
+}
+"""
+
+# 命令按钮样式
+COMMAND_BUTTON_STYLE = """
+/* Command Buttons */
+QMainWindow QWidget[objectName^="cmd_tab_widget"] QPushButton {
+    background-color: #53A6D8;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+}
+
+QMainWindow QWidget[objectName^="cmd_tab_widget"] QPushButton:hover {
+    filter: brightness(110%);
+}
+
+QMainWindow QWidget[objectName^="cmd_tab_widget"] QPushButton:pressed {
+    filter: brightness(90%);
+}
+"""
+
+# 动态按钮样式
+DYNAMIC_BUTTON_STYLE = """
+/* Color Choose Button */
+QPushButton#btn_choose_color {
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    padding: 4px;
+    min-width: 60px;
+    min-height: 24px;
+}
+
+QPushButton#btn_choose_color:hover {
+    border-color: #53A6D8;
+}
+
+/* Command Button Base Style */
+QPushButton[objectName^="cmd_button"] {
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    text-align: center;
+}
+
+QPushButton[objectName^="cmd_button"]:hover {
+    filter: brightness(110%);
+}
+
+QPushButton[objectName^="cmd_button"]:pressed {
+    filter: brightness(90%);
+}
+"""
+
+def get_stylesheet():
+    """获取所有样式表"""
+    return MAIN_STYLE + DIALOG_STYLE + COMMAND_BUTTON_STYLE + DYNAMIC_BUTTON_STYLE 

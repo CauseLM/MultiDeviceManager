@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QInputDia
 from ui.ui_add_cmd_diag import Ui_AddCommandDialog
 from ui.ui_main_window import Ui_MainWindow
 from ui.ui_register_device_diag import Ui_diag_register_device
+from styles import get_stylesheet
 
 
 def get_resource_path(relative_path):
@@ -39,12 +40,28 @@ def get_app_path():
         return os.path.dirname(os.path.abspath(__file__))
 
 
+def get_data_path():
+    """获取数据目录"""
+    data_dir = os.path.join(get_app_path(), "data")
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+    return data_dir
+
+
 def get_config_path():
     """获取配置文件目录"""
-    config_dir = os.path.join(get_app_path(), "config")
+    config_dir = os.path.join(get_data_path(), "config")
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
     return config_dir
+
+
+def get_log_path():
+    """获取日志目录"""
+    log_dir = os.path.join(get_data_path(), "logs")
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    return log_dir
 
 
 def get_temp_file_path(filename):
@@ -53,25 +70,8 @@ def get_temp_file_path(filename):
 
 
 def load_stylesheet():
-    """加载所有样式表"""
-    styles = []
-    style_files = [
-        'styles/main.qss',
-        'styles/dialog.qss',
-        'styles/command_button.qss',
-        'styles/dynamic_buttons.qss'
-    ]
-    
-    for style_file in style_files:
-        try:
-            style_path = get_resource_path(style_file)
-            if os.path.exists(style_path):
-                with open(style_path, 'r', encoding='utf-8') as f:
-                    styles.append(f.read())
-        except Exception as e:
-            print(f"加载样式表 {style_file} 失败: {e}")
-    
-    return '\n'.join(styles)
+    """加载样式表"""
+    return get_stylesheet()
 
 
 class RegisterDeviceDialog(QDialog):
@@ -352,11 +352,8 @@ class MainWindow(QMainWindow):
         self.commands_file = os.path.join(get_config_path(), "commands.csv")
         self.groups_file = os.path.join(get_config_path(), "groups.csv")
 
-        # 创建日志目录
-        log_dir = os.path.join(get_app_path(), "logs")
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
-        self.log_file = os.path.join(log_dir, f"log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
+        # 创建日志文件
+        self.log_file = os.path.join(get_log_path(), f"log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
 
         # 初始化配置文件
         self.init_config_files()
@@ -404,18 +401,15 @@ class MainWindow(QMainWindow):
 
     def init_config_files(self):
         """初始化配置文件，如果配置目录中不存在，则从资源中复制"""
-        # 确保样式表目录存在
-        styles_dir = os.path.join(get_app_path(), "styles")
-        if not os.path.exists(styles_dir):
-            os.makedirs(styles_dir)
+        # 确保资源目录存在
+        resource_dir = get_resource_path("")
+        if not os.path.exists(resource_dir):
+            os.makedirs(resource_dir)
 
         config_files = {
             "config/devices.csv": self.devices_file,
             "config/commands.csv": self.commands_file,
-            "config/groups.csv": self.groups_file,
-            "styles/main.qss": os.path.join(styles_dir, "main.qss"),
-            "styles/dialog.qss": os.path.join(styles_dir, "dialog.qss"),
-            "styles/command_button.qss": os.path.join(styles_dir, "command_button.qss")
+            "config/groups.csv": self.groups_file
         }
 
         for resource_name, config_path in config_files.items():
@@ -428,8 +422,13 @@ class MainWindow(QMainWindow):
                         with open(resource_path, 'r', encoding='utf-8') as src:
                             with open(config_path, 'w', encoding='utf-8') as dst:
                                 dst.write(src.read())
-                except:
-                    # 如果资源文件不存在，创建空文件
+                    else:
+                        # 如果资源文件不存在，创建空文件
+                        with open(config_path, 'w', encoding='utf-8') as f:
+                            f.write('')
+                except Exception as e:
+                    print(f"初始化文件 {resource_name} 失败: {e}")
+                    # 如果出错，创建空文件
                     with open(config_path, 'w', encoding='utf-8') as f:
                         f.write('')
 
