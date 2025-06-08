@@ -20,6 +20,3 @@ ENV/
 # Logs
 logs/
 *.log
-
-# Local configuration
-config/*.csv

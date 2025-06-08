@@ -1,0 +1,53 @@
+命令,说明
+adb devices,列出已连接的设备
+adb shell,进入设备的shell环境
+adb install,安装APK文件
+adb uninstall,卸载应用程序
+adb pull,从设备拉取文件
+adb push,推送文件到设备
+adb logcat,查看设备日志
+adb reboot,重启设备
+adb shell pm list packages,列出已安装的应用程序
+adb shell dumpsys battery,查看电池信息
+adb shell dumpsys wifi,查看WiFi信息
+adb shell dumpsys meminfo,查看内存信息
+adb shell dumpsys cpuinfo,查看CPU信息
+adb shell dumpsys activity,查看活动信息
+adb shell dumpsys window,查看窗口信息
+adb shell dumpsys power,查看电源信息
+adb shell dumpsys display,查看显示信息
+adb shell dumpsys sensorservice,查看传感器信息
+adb shell dumpsys location,查看位置信息
+adb shell dumpsys bluetooth,查看蓝牙信息
+adb shell dumpsys audio,查看音频信息
+adb shell dumpsys media_session,查看媒体会话信息
+adb shell dumpsys media_router,查看媒体路由信息
+adb shell dumpsys netstats,查看网络统计信息
+adb shell dumpsys connectivity,查看网络连接信息
+adb shell dumpsys telephony.registry,查看电话信息
+adb shell dumpsys wifi_p2p,查看WiFi直连信息
+adb shell dumpsys usb,查看USB信息
+adb shell dumpsys input,查看输入设备信息
+adb shell dumpsys accessibility,查看辅助功能信息
+adb shell dumpsys appops,查看应用权限信息
+adb shell dumpsys procstats,查看进程统计信息
+adb shell dumpsys alarm,查看闹钟信息
+adb shell dumpsys jobscheduler,查看任务调度信息
+adb shell dumpsys dropbox,查看系统日志信息
+adb shell dumpsys netpolicy,查看网络策略信息
+adb shell dumpsys netd,查看网络守护进程信息
+adb shell dumpsys network_management,查看网络管理信息
+adb shell dumpsys network_score,查看网络评分信息
+adb shell dumpsys network_stats,查看网络统计信息
+adb shell dumpsys network_policy,查看网络策略信息
+adb shell dumpsys network_watchlist,查看网络监视列表信息
+adb shell dumpsys network_management,查看网络管理信息
+adb shell dumpsys network_score,查看网络评分信息
+adb shell dumpsys network_stats,查看网络统计信息
+adb shell dumpsys network_policy,查看网络策略信息
+adb shell dumpsys network_watchlist,查看网络监视列表信息
+adb shell dumpsys network_management,查看网络管理信息
+adb shell dumpsys network_score,查看网络评分信息
+adb shell dumpsys network_stats,查看网络统计信息
+adb shell dumpsys network_policy,查看网络策略信息
+adb shell dumpsys network_watchlist,查看网络监视列表信息 
