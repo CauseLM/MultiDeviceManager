@@ -1,0 +1,56 @@
+命令,说明
+adb devices,列出所有连接的设备
+adb shell,进入设备的shell环境
+adb install,安装APK文件
+adb uninstall,卸载应用
+adb pull,从设备拉取文件
+adb push,向设备推送文件
+adb logcat,查看设备日志
+adb reboot,重启设备
+adb shell pm list packages,列出所有已安装的应用包名
+adb shell dumpsys,查看系统服务信息
+adb shell screencap,截取屏幕截图
+adb shell screenrecord,录制屏幕
+adb shell input text,输入文本
+adb shell input tap,模拟点击屏幕
+adb shell input swipe,模拟滑动屏幕
+adb shell am start,启动应用
+adb shell am force-stop,强制停止应用
+adb shell am broadcast,发送广播
+adb shell settings,修改系统设置
+adb shell wm size,修改屏幕分辨率
+adb shell wm density,修改屏幕密度
+adb shell dumpsys battery,查看电池信息
+adb shell dumpsys cpuinfo,查看CPU信息
+adb shell dumpsys meminfo,查看内存信息
+adb shell dumpsys wifi,查看WiFi信息
+adb shell dumpsys bluetooth,查看蓝牙信息
+adb shell dumpsys location,查看位置信息
+adb shell dumpsys sensorservice,查看传感器信息
+adb shell dumpsys audio,查看音频信息
+adb shell dumpsys display,查看显示信息
+adb shell dumpsys power,查看电源信息
+adb shell dumpsys activity,查看活动信息
+adb shell dumpsys window,查看窗口信息
+adb shell dumpsys input,查看输入信息
+adb shell dumpsys connectivity,查看网络连接信息
+adb shell dumpsys telephony,查看电话信息
+adb shell dumpsys media,查看媒体信息
+adb shell dumpsys camera,查看相机信息
+adb shell dumpsys usb,查看USB信息
+adb shell dumpsys nfc,查看NFC信息
+adb shell dumpsys bluetooth_manager,查看蓝牙管理器信息
+adb shell dumpsys wifi_manager,查看WiFi管理器信息
+adb shell dumpsys location_manager,查看位置管理器信息
+adb shell dumpsys audio_manager,查看音频管理器信息
+adb shell dumpsys display_manager,查看显示管理器信息
+adb shell dumpsys power_manager,查看电源管理器信息
+adb shell dumpsys activity_manager,查看活动管理器信息
+adb shell dumpsys window_manager,查看窗口管理器信息
+adb shell dumpsys input_manager,查看输入管理器信息
+adb shell dumpsys connectivity_manager,查看网络连接管理器信息
+adb shell dumpsys telephony_manager,查看电话管理器信息
+adb shell dumpsys media_manager,查看媒体管理器信息
+adb shell dumpsys camera_manager,查看相机管理器信息
+adb shell dumpsys usb_manager,查看USB管理器信息
+adb shell dumpsys nfc_manager,查看NFC管理器信息 

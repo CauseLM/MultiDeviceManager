@@ -201,8 +201,31 @@ QPushButton[objectName^="cmd_button"]:hover {
 QPushButton[objectName^="cmd_button"]:pressed {
     filter: brightness(90%);
 }
+
+/* Command Completer */
+QCompleter {
+    background-color: white;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+QCompleter::item {
+    padding: 4px 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+QCompleter::item:selected {
+    background-color: #E8F4FC;
+    color: #53A6D8;
+}
+
+QCompleter::item:hover {
+    background-color: #f5f5f5;
+}
 """
+
 
 def get_stylesheet():
     """获取所有样式表"""
-    return MAIN_STYLE + DIALOG_STYLE + COMMAND_BUTTON_STYLE + DYNAMIC_BUTTON_STYLE 
+    return MAIN_STYLE + DIALOG_STYLE + COMMAND_BUTTON_STYLE + DYNAMIC_BUTTON_STYLE

@@ -8,10 +8,11 @@ import threading
 from datetime import datetime
 from typing import override
 
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtCore import Qt, QThread, Signal, QStringListModel
 from PySide6.QtGui import QIcon, QColor
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QInputDialog, QTreeWidgetItem, QMenu, QWidget,
-                               QVBoxLayout, QPushButton, QDialog, QColorDialog, QGridLayout, QTextBrowser, QHBoxLayout)
+                               QVBoxLayout, QPushButton, QDialog, QColorDialog, QGridLayout, QTextBrowser, QHBoxLayout,
+                               QCompleter)
 
 from ui.ui_add_cmd_diag import Ui_AddCommandDialog
 from ui.ui_main_window import Ui_MainWindow
@@ -126,7 +127,7 @@ class AddCmdDialog(QDialog):
         self.color = "#E0E0E0"  # 默认浅灰色
         self.ui.btn_choose_color.setObjectName("btn_choose_color")
         self.update_color_button()
-        
+
         # 设置按钮名称输入框获得焦点
         self.ui.diag_input_btn_name.setFocus()
         # 选中输入框中的文本（如果有的话）
@@ -139,15 +140,26 @@ class AddCmdDialog(QDialog):
             self.update_color_button()
 
     def update_color_button(self):
-        self.ui.btn_choose_color.setStyleSheet(f"background-color: {self.color};")
+        self.ui.btn_choose_color.setStyleSheet(f"background-color: {self.color}; color: black;")
 
     @override
     def accept(self):
-        self.name = self.ui.diag_input_btn_name.text()
-        # 如果命令以 'adb' 开头，去掉它
+        name = self.ui.diag_input_btn_name.text().strip()
         cmd = self.ui.diag_input_adb.text().strip()
+        
+        # 校验输入
+        if not name:
+            QMessageBox.warning(self, "警告", "按钮名称不能为空")
+            return
+        if not cmd:
+            QMessageBox.warning(self, "警告", "命令不能为空")
+            return
+            
+        # 如果命令以 'adb' 开头，去掉它
         if cmd.lower().startswith('adb '):
             cmd = cmd[4:].strip()
+            
+        self.name = name
         self.cmd = cmd
         self.is_blocking = self.ui.radio_block_yes.isChecked()
         self.color = self.color
@@ -332,6 +344,60 @@ class LogWindow(QDialog):
         super().closeEvent(event)
 
 
+class CommandCompleter(QCompleter):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.commands = {}
+        self.load_commands()
+        self.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
+        self.setFilterMode(Qt.MatchFlag.MatchContains)
+        self.setMaxVisibleItems(10)  # 设置最大显示项数
+        self.setCompletionMode(QCompleter.CompletionMode.PopupCompletion)  # 设置弹出模式
+        
+    def load_commands(self):
+        commands_file = os.path.join(get_config_path(), 'common_commands.csv')
+        if os.path.exists(commands_file):
+            with open(commands_file, 'r', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                next(reader)  # 跳过标题行
+                for row in reader:
+                    if len(row) >= 2:
+                        cmd, desc = row
+                        self.commands[cmd] = desc
+                        
+    def update_completion_list(self, text):
+        matches = []
+        if not text:
+            # 如果没有输入文本，显示所有命令
+            for cmd, desc in self.commands.items():
+                matches.append(f"{cmd} - {desc}")
+        else:
+            # 如果有输入文本，显示匹配的命令
+            for cmd, desc in self.commands.items():
+                if text.lower() in cmd.lower():
+                    matches.append(f"{cmd} - {desc}")
+                
+        self.setModel(QStringListModel(matches))
+        
+    def get_command(self, completion):
+        if " - " in completion:
+            return completion.split(" - ")[0]
+        return completion
+        
+    def splitPath(self, path):
+        # 重写splitPath方法，使其只返回命令部分
+        if " - " in path:
+            return [path.split(" - ")[0]]
+        return [path]
+        
+    def pathFromIndex(self, index):
+        # 重写pathFromIndex方法，确保只返回命令部分
+        text = self.model().data(index, Qt.ItemDataRole.DisplayRole)
+        if " - " in text:
+            return text.split(" - ")[0]
+        return text
+
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -373,6 +439,10 @@ class MainWindow(QMainWindow):
 
         # 创建日志窗口
         self.log_window = None
+
+        # 初始化命令提示器
+        self.command_completer = CommandCompleter(self)
+        self.ui.lineEdit_cmd.setCompleter(self.command_completer)
 
         # 连接信号
         self.bind()
@@ -442,6 +512,10 @@ class MainWindow(QMainWindow):
         self.ui.btn_clear_log.clicked.connect(self.clear_log)
         self.ui.btn_pop_log.clicked.connect(self.show_log_window)
 
+        # 连接命令文本框的文本变化信号
+        self.ui.lineEdit_cmd.textChanged.connect(self.on_command_text_changed)
+        self.ui.lineEdit_cmd.installEventFilter(self)  # 安装事件过滤器
+
     def load_devices(self):
         self.registered_devices = {}
         if os.path.exists(self.devices_file):
@@ -473,6 +547,8 @@ class MainWindow(QMainWindow):
                             layout.setSpacing(10)
                             layout.setContentsMargins(10, 10, 10, 10)
                             layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+                            # 设置分组背景颜色为浅灰色
+                            new_group.setStyleSheet("background-color: #f5f5f5;")
                             self.ui.cmd_tab_widget.addTab(new_group, group_name)
 
                     # 只有在文件存在但没有任何有效分组时才创建默认分组
@@ -482,6 +558,8 @@ class MainWindow(QMainWindow):
                         layout.setSpacing(10)
                         layout.setContentsMargins(10, 10, 10, 10)
                         layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+                        # 设置分组背景颜色为浅灰色
+                        new_group.setStyleSheet("background-color: #f5f5f5;")
                         self.ui.cmd_tab_widget.addTab(new_group, "默认分组")
                         self.save_groups()
             else:
@@ -491,6 +569,8 @@ class MainWindow(QMainWindow):
                 layout.setSpacing(10)
                 layout.setContentsMargins(10, 10, 10, 10)
                 layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+                # 设置分组背景颜色为浅灰色
+                new_group.setStyleSheet("background-color: #f5f5f5;")
                 self.ui.cmd_tab_widget.addTab(new_group, "默认分组")
                 self.save_groups()
         except Exception as e:
@@ -501,6 +581,8 @@ class MainWindow(QMainWindow):
             layout.setSpacing(10)
             layout.setContentsMargins(10, 10, 10, 10)
             layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+            # 设置分组背景颜色为浅灰色
+            new_group.setStyleSheet("background-color: #f5f5f5;")
             self.ui.cmd_tab_widget.addTab(new_group, "默认分组")
             self.save_groups()
 
@@ -729,7 +811,14 @@ class MainWindow(QMainWindow):
 
     def add_new_group(self):
         name, ok = QInputDialog.getText(self, "添加新分组", "请输入分组名称：")
-        if ok and name:
+        if ok:
+            # 去除首尾空格
+            name = name.strip()
+            # 校验分组名称
+            if not name:
+                QMessageBox.warning(self, "警告", "分组名称不能为空")
+                return
+                
             # 检查是否已存在同名分组
             for i in range(self.ui.cmd_tab_widget.count()):
                 if self.ui.cmd_tab_widget.tabText(i) == name:
@@ -742,6 +831,9 @@ class MainWindow(QMainWindow):
             layout.setSpacing(10)
             layout.setContentsMargins(10, 10, 10, 10)
             layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+            
+            # 设置分组背景颜色为浅灰色
+            new_group.setStyleSheet("background-color: #f5f5f5;")
 
             new_index = self.ui.cmd_tab_widget.addTab(new_group, name)
             # 切换到新创建的分组
@@ -826,13 +918,13 @@ class MainWindow(QMainWindow):
                 button.setProperty('cmd', cmd)
                 button.setProperty('is_blocking', is_blocking)
                 button.setProperty('color', color)
-                
+
                 # 设置按钮固定大小
                 button.setFixedSize(90, 28)
-                
-                # 设置按钮背景色
-                button.setStyleSheet(f"background-color: {color};")
-                
+
+                # 设置按钮背景色和文字颜色
+                button.setStyleSheet(f"background-color: {color}; color: black;")
+
                 button.clicked.connect(lambda checked, b=button: self.run_command(b))
 
                 # 设置右键菜单
@@ -925,13 +1017,26 @@ class MainWindow(QMainWindow):
         self.execute_command(cmd, is_blocking)
 
     def run_direct_command(self):
-        cmd = self.ui.lineEdit_cmd.text()
-        if cmd:
-            self.execute_command(cmd, False)
+        cmd = self.ui.lineEdit_cmd.text().strip()
+        if not cmd:
+            return
+            
+        # 如果命令包含说明，只取命令部分
+        if " - " in cmd:
+            cmd = cmd.split(" - ")[0]
+            
+        # 如果命令以 'adb' 开头，去掉它
+        if cmd.lower().startswith('adb '):
+            cmd = cmd[4:].strip()
+            
+            
+        # 执行命令
+        self.execute_command(cmd, False)  # 直接命令默认不阻塞
+            
 
     def execute_command(self, cmd, is_blocking):
         if self.is_running_command:
-            QMessageBox.information(self, "提示", "正在执行命令，请等待当前命令执行完成...")
+            QMessageBox.information(self, "提示", "正在执行命令，请等待当前命令执行完成，或手动停止...")
             return
         self.is_running_command = True
         try:
@@ -1055,6 +1160,24 @@ class MainWindow(QMainWindow):
             self.log_writer.stop()
         # 调用父类的closeEvent
         super().closeEvent(event)
+
+    def eventFilter(self, obj, event):
+        # 处理输入框的事件
+        if obj == self.ui.lineEdit_cmd:
+            if event.type() == event.Type.FocusIn:
+                # 当输入框获得焦点时，显示所有命令
+                self.command_completer.update_completion_list("")
+                self.command_completer.complete()
+            elif event.type() == event.Type.KeyPress:
+                # 当按下回车键时，确保只使用命令部分
+                if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
+                    text = self.ui.lineEdit_cmd.text()
+                    if " - " in text:
+                        self.ui.lineEdit_cmd.setText(text.split(" - ")[0])
+        return super().eventFilter(obj, event)
+
+    def on_command_text_changed(self, text):
+        self.command_completer.update_completion_list(text)
 
 
 def main():
