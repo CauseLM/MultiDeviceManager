@@ -8,7 +8,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('ui/*.ui', 'ui'),
-        ('config/*.csv', 'config'),
+        ('data/config/*.csv', 'config'),
         ('resources/app_icon.ico', 'resources'),
     ],
     hiddenimports=[],

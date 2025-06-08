@@ -479,7 +479,8 @@ class MainWindow(QMainWindow):
         config_files = {
             "config/devices.csv": self.devices_file,
             "config/commands.csv": self.commands_file,
-            "config/groups.csv": self.groups_file
+            "config/groups.csv": self.groups_file,
+            "config/common_commands.csv": os.path.join(get_config_path(), "common_commands.csv")
         }
 
         for resource_name, config_path in config_files.items():
